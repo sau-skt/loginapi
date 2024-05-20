@@ -81,9 +81,9 @@ app.get('/login', async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (user && await bcrypt.compare(password, user.password)) {
-      res.json({ message: 'Login successful' });
+      res.json({ message: true });
     } else {
-      res.status(401).json({ error: 'Invalid email or password' });
+      res.status(200).json({ message: false });
     }
   } catch (err) {
     console.error(err);
