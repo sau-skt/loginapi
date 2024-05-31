@@ -24,7 +24,8 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Define User schema
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  mid: { type: String, required: true }
 });
 
 // Create User model
@@ -32,15 +33,15 @@ const User = mongoose.model('users', userSchema);
 
 // Register User (Example endpoint for registering users)
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, mid } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+  if (!email || !password || !mid) {
+    return res.status(400).json({ error: 'Email ,password and mid are required' });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword });
+    const newUser = new User({ email, password: hashedPassword, mid });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
@@ -50,7 +51,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Define the GET API to check if email exists and return password
-app.get('/check-email', async (req, res) => {
+app.get('/get-mid', async (req, res) => {
   const email = req.query.email;
 
   if (!email) {
@@ -60,7 +61,7 @@ app.get('/check-email', async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (user) {
-      res.json({ exists: true, password: user.password });
+      res.json({ exists: true, mid: user.mid });
     } else {
       res.json({ exists: false });
     }
